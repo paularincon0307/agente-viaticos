@@ -1,10 +1,22 @@
 import sys
+from pathlib import Path
 
 from dotenv import load_dotenv
 from google import genai
 
-MODELO = "gemini-3.8-flash"
-INSTRUCCIONES = "Responde siempre en español, en un máximo de 3 frases."
+MODELO = "gemini-3.5-flash-lite"
+INSTRUCCIONES = "Responde como un cavernicola en español, en un máximo de 3 frases."
+
+
+def cargar_instrucciones():
+    base = Path(__file__).parent
+    instrucciones = (base / "prompts" / "sistema.md").read_text(encoding="utf-8")
+    documentos = [
+        f'<documento nombre="{archivo.name}">\n{archivo.read_text(encoding="utf-8")}\n</documento>'
+        for archivo in sorted((base / "Conocimientos").iterdir())
+        if archivo.is_file()
+    ]
+    return "\n\n".join([instrucciones, *documentos])
 
 
 def main():
@@ -18,7 +30,7 @@ def main():
     interaction = client.interactions.create(
         model=MODELO,
         input=pregunta,
-        system_instruction=INSTRUCCIONES,
+        system_instruction=cargar_instrucciones(),
     )
     print(interaction.output_text)
 
