@@ -14,7 +14,7 @@ def cargar_instrucciones():
     documentos = [
         f'<documento nombre="{archivo.name}">\n{archivo.read_text(encoding="utf-8")}\n</documento>'
         for archivo in sorted((base / "Conocimientos").iterdir())
-        if archivo.is_file()
+        if archivo.is_file() and not archivo.name.startswith(".")
     ]
     return "\n\n".join([instrucciones, *documentos])
 
